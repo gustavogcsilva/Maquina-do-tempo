@@ -1,0 +1,39 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  capsules  Capsule[]
+
+  @@map("users")
+}
+
+model Capsule {
+  id             String    @id @default(uuid())
+  userId         String    @map("user_id")
+  title          String
+  content        String    @db.Text
+  unlockAt       DateTime  @map("unlock_at")
+  isOpened       Boolean   @default(false) @map("is_opened")
+  recipientEmail String?   @map("recipient_email")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([unlockAt])
+  @@map("capsules")
+}
