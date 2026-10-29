@@ -5,29 +5,26 @@ import { PrismaPg } from '@prisma/adapter-pg';
 
 const { Pool } = pg;
 
+const databaseUrl = process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL não definida. Configure a variável de ambiente antes de iniciar o Prisma.');
+}
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  connectionString: databaseUrl,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: true } : false,
+  max: 10,
 });
 
 const adapter = new PrismaPg(pool);
 
-export const prisma = new PrismaClient({ adapter });
+export const prisma = new PrismaClient({
+  adapter,
+  log: ['error'],
+});
 
-async function run() {
-  try {
-    console.log('🔄 Conectando via Adapter PG + Prisma...');
-    const users = await prisma.user.findMany();
-    console.log('✅ CONECTADO COM SUCESSO AO SUPABASE!');
-    console.log('Registros encontrados na tabela users:', users);
-  } catch (error) {
-    console.error('❌ Erro na consulta:', error);
-  } finally {
-    await prisma.$disconnect();
-    await pool.end();
-  }
+export async function disconnectPrisma() {
+  await prisma.$disconnect();
+  await pool.end();
 }
-
-run();
