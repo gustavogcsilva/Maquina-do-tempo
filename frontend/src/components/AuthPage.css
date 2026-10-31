@@ -1,0 +1,638 @@
+/* ==========================================================================
+   ESTÉTICA "CÁPSULA DO TEMPO" - DESIGN SYSTEM TEMPORAL
+   Paleta: Bronze Envelhecido, Ouro Fosco, Couro Escuro, Pergaminho e Obsidian
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --vault-bg-deep: #08090d;
+  --vault-bg-surface: #101218;
+  --vault-bg-card: rgba(18, 20, 27, 0.78);
+  
+  --vault-bronze-dark: #4d361c;
+  --vault-bronze: #8c642e;
+  --vault-bronze-light: #b88d4d;
+  --vault-gold-matte: #d4af37;
+  --vault-gold-bright: #f0cf65;
+  
+  --vault-parchment: #ede5d4;
+  --vault-parchment-muted: #9e9382;
+  --vault-sepia-dim: #383127;
+  
+  --font-serif: 'Cinzel', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 1. Cenário Imersivo da Câmara do Tempo */
+.time-chamber {
+  min-height: 100svh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  background-color: var(--vault-bg-deep);
+  background-image: 
+    radial-gradient(ellipse at 50% 0%, rgba(184, 141, 77, 0.15), transparent 60%),
+    radial-gradient(ellipse at 20% 80%, rgba(140, 100, 46, 0.1), transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(212, 175, 55, 0.08), transparent 45%),
+    linear-gradient(180deg, #090a0e 0%, #111319 100%);
+  color: var(--vault-parchment);
+  font-family: var(--font-sans);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Luz ambiente etérea */
+.time-aurora {
+  position: absolute;
+  top: -15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(800px, 120vw);
+  height: 480px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.14) 0%, rgba(140, 100, 46, 0.06) 50%, transparent 75%);
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Anéis concêntricos evocando relógio astronômico / astrolábio */
+.time-rings {
+  position: absolute;
+  width: 720px;
+  height: 720px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.18;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px dashed var(--vault-gold-matte);
+}
+
+.ring-outer {
+  animation: rotateClockwise 140s linear infinite;
+}
+
+.ring-inner {
+  inset: 90px;
+  border: 1px solid var(--vault-bronze-light);
+  border-style: dotted;
+  animation: rotateCounterClockwise 100s linear infinite;
+}
+
+@keyframes rotateClockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotateCounterClockwise {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+/* 2. Chassis e Visor da Cápsula (Glassmorphism + Borda de Bronze) */
+.capsule-chassis {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 460px);
+  padding: 1.5px;
+  border-radius: 24px;
+  background: linear-gradient(
+    145deg,
+    rgba(240, 207, 101, 0.45) 0%,
+    rgba(140, 100, 46, 0.15) 40%,
+    rgba(77, 54, 28, 0.3) 70%,
+    rgba(212, 175, 55, 0.35) 100%
+  );
+  box-shadow: 
+    0 30px 90px rgba(0, 0, 0, 0.75),
+    0 0 50px rgba(184, 141, 77, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+.capsule-visor {
+  background: var(--vault-bg-card);
+  backdrop-filter: blur(28px) saturate(135%);
+  -webkit-backdrop-filter: blur(28px) saturate(135%);
+  border-radius: 23px;
+  padding: 42px 36px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efeito sutil de visor de vidro polido */
+.capsule-visor::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* 3. Cabeçalho & Emblema */
+.capsule-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.capsule-emblem {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  background: radial-gradient(circle at 35% 35%, #23201d, #141318);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  display: grid;
+  place-items: center;
+  box-shadow: 
+    0 10px 24px rgba(0, 0, 0, 0.4),
+    0 0 16px rgba(212, 175, 55, 0.15);
+  margin-bottom: 6px;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.capsule-emblem:hover {
+  transform: rotate(180deg);
+}
+
+.emblem-svg {
+  width: 38px;
+  height: 38px;
+}
+
+.capsule-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--vault-bronze-light);
+  text-transform: uppercase;
+}
+
+.capsule-title {
+  margin: 2px 0 0;
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 6vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #fff9ed;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  line-height: 1.2;
+}
+
+.capsule-tagline {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--vault-parchment-muted);
+  max-width: 320px;
+}
+
+/* 4. Entrada Social com Google */
+.social-entrance {
+  width: 100%;
+}
+
+.google-capsule-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 13px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(184, 141, 77, 0.35);
+  background: rgba(22, 24, 32, 0.85);
+  color: var(--vault-parchment);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.google-capsule-btn:hover {
+  background: rgba(32, 34, 46, 0.95);
+  border-color: var(--vault-gold-bright);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.2);
+  transform: translateY(-1px);
+  color: #ffffff;
+}
+
+.google-capsule-btn:focus-visible {
+  outline: 2px solid var(--vault-gold-bright);
+  outline-offset: 2px;
+}
+
+/* 5. Divisor Visual */
+.vault-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 2px 0;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(184, 141, 77, 0.3), transparent);
+}
+
+.divider-label {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--vault-bronze-light);
+}
+
+/* 6. Alertas / Feedback */
+.vault-alert {
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1.4;
+}
+
+.error-alert {
+  background: rgba(180, 40, 40, 0.15);
+  border: 1px solid rgba(220, 60, 60, 0.35);
+  color: #ffb8b8;
+}
+
+.success-alert {
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: #fcebbb;
+}
+
+/* 7. Formulário Tradicional */
+.vault-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.field-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--vault-parchment);
+}
+
+.discrete-link {
+  font-size: 12px;
+  color: var(--vault-bronze-light);
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+
+.discrete-link:hover {
+  color: var(--vault-gold-bright);
+  text-decoration: underline;
+}
+
+.discrete-link:focus-visible {
+  outline: 2px solid var(--vault-gold-bright);
+  border-radius: 4px;
+}
+
+.input-frame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(12, 14, 20, 0.85);
+  border: 1px solid rgba(184, 141, 77, 0.28);
+  border-radius: 12px;
+  transition: all 0.22s ease;
+}
+
+.input-frame:hover {
+  border-color: rgba(212, 175, 55, 0.45);
+}
+
+.input-frame:focus-within {
+  border-color: var(--vault-gold-matte);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.18), inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  background: rgba(15, 17, 24, 0.95);
+}
+
+.input-frame input {
+  width: 100%;
+  padding: 13px 40px 13px 14px;
+  border: 0;
+  background: transparent;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  outline: none;
+}
+
+.input-frame input::placeholder {
+  color: rgba(158, 147, 130, 0.5);
+}
+
+.input-ornament {
+  position: absolute;
+  right: 14px;
+  font-size: 14px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.toggle-eye-btn {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: 0;
+  color: var(--vault-parchment-muted);
+  cursor: pointer;
+  padding: 6px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  transition: color 0.18s ease;
+}
+
+.toggle-eye-btn:hover {
+  color: var(--vault-gold-bright);
+}
+
+.toggle-eye-btn:focus-visible {
+  outline: 2px solid var(--vault-gold-bright);
+}
+
+/* Checkbox Personalizado */
+.remember-row {
+  margin: 2px 0 6px;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.custom-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1px solid rgba(184, 141, 77, 0.4);
+  background: rgba(12, 14, 20, 0.8);
+  display: grid;
+  place-items: center;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+}
+
+.checkbox-container input:checked ~ .custom-check {
+  background: var(--vault-bronze);
+  border-color: var(--vault-gold-matte);
+}
+
+.checkbox-container input:checked ~ .custom-check::after {
+  content: '✓';
+  font-size: 12px;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.checkbox-container:focus-within .custom-check {
+  box-shadow: 0 0 0 2px var(--vault-gold-bright);
+}
+
+.checkbox-text {
+  font-size: 12px;
+  color: var(--vault-parchment-muted);
+}
+
+/* 8. Botão de Ação Principal (Bronze/Ouro com Efeito de Ativação) */
+.capsule-submit-btn {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  border: 0;
+  border-radius: 12px;
+  padding: 14px 20px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #1a140d;
+  background: linear-gradient(
+    135deg,
+    #f4d375 0%,
+    #d4af37 40%,
+    #b88d4d 75%,
+    #8c642e 100%
+  );
+  box-shadow: 
+    0 10px 25px rgba(184, 141, 77, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.btn-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.4), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.capsule-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 14px 34px rgba(212, 175, 55, 0.45),
+    0 0 20px rgba(240, 207, 101, 0.35),
+    inset 0 1px 2px rgba(255, 255, 255, 0.7);
+  filter: brightness(1.05);
+}
+
+.capsule-submit-btn:hover .btn-glow {
+  opacity: 1;
+}
+
+.capsule-submit-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 15px rgba(184, 141, 77, 0.3);
+}
+
+.capsule-submit-btn:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.capsule-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+  transform: none;
+}
+
+.btn-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-icon {
+  font-size: 16px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(26, 20, 13, 0.25);
+  border-top-color: #1a140d;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 9. Rodapé do Card e Alternância de Telas */
+.capsule-footer {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(184, 141, 77, 0.15);
+}
+
+.toggle-auth-prompt {
+  margin: 0;
+  font-size: 13px;
+  color: var(--vault-parchment-muted);
+}
+
+.toggle-auth-action {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--vault-gold-bright);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.18s ease;
+}
+
+.toggle-auth-action:hover {
+  color: #ffffff;
+}
+
+.toggle-auth-action:focus-visible {
+  outline: 2px solid var(--vault-gold-bright);
+  border-radius: 4px;
+}
+
+.view-dashboard-shortcut {
+  background: transparent;
+  border: 0;
+  padding: 4px;
+  font-size: 12px;
+  color: var(--vault-bronze-light);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.view-dashboard-shortcut:hover {
+  color: var(--vault-gold-bright);
+}
+
+/* 10. Selo de Preservação no Fundo da Página */
+.time-preservation-seal {
+  position: relative;
+  z-index: 1;
+  margin-top: 24px;
+  text-align: center;
+}
+
+.time-preservation-seal span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: rgba(158, 147, 130, 0.45);
+}
+
+/* Animação suave para novos campos */
+.animate-slide-down {
+  animation: slideDown 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsividade Mobile e Telas Menores */
+@media (max-width: 480px) {
+  .time-chamber {
+    padding: 20px 12px;
+  }
+  
+  .capsule-visor {
+    padding: 32px 22px;
+    gap: 18px;
+  }
+  
+  .capsule-title {
+    font-size: 24px;
+  }
+}
+

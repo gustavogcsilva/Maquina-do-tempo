@@ -6,10 +6,25 @@ datasource db {
   provider = "postgresql"
 }
 
+enum CapsuleDeliveryChannel {
+  EMAIL
+  WHATSAPP
+}
+
+enum CapsuleDeliveryStatus {
+  SCHEDULED
+  READY
+  SENT
+  FAILED
+}
+
 model User {
   id        String    @id @default(uuid())
   email     String    @unique
+  googleSub String?   @unique @map("google_sub")
   name      String?
+  phoneNumber String? @map("phone_number")
+  whatsappConsentAt DateTime? @map("whatsapp_consent_at")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
 
@@ -26,6 +41,12 @@ model Capsule {
   unlockAt       DateTime  @map("unlock_at")
   isOpened       Boolean   @default(false) @map("is_opened")
   recipientEmail String?   @map("recipient_email")
+  scope          String    @default("pessoal")
+  theme          String    @default("amor")
+  mood           String?
+  priority       String    @default("Média")
+  actionItems    Json      @default("[]") @map("action_items")
+  deliveries     CapsuleDelivery[]
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
@@ -34,4 +55,24 @@ model Capsule {
   @@index([userId])
   @@index([unlockAt])
   @@map("capsules")
+}
+
+model CapsuleDelivery {
+  id          String                 @id @default(uuid())
+  capsuleId   String                 @map("capsule_id")
+  channel     CapsuleDeliveryChannel
+  status      CapsuleDeliveryStatus  @default(SCHEDULED)
+  recipient   String
+  scheduledAt DateTime               @map("scheduled_at")
+  sentAt      DateTime?              @map("sent_at")
+  attempts    Int                    @default(0)
+  lastError   String?                @db.Text @map("last_error")
+  createdAt   DateTime               @default(now()) @map("created_at")
+  updatedAt   DateTime               @updatedAt @map("updated_at")
+
+  capsule     Capsule                @relation(fields: [capsuleId], references: [id], onDelete: Cascade)
+
+  @@unique([capsuleId, channel])
+  @@index([status, scheduledAt])
+  @@map("capsule_deliveries")
 }

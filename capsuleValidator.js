@@ -30,4 +30,46 @@ export const createCapsuleSchema = z.object({
     .refine((value) => isValidIsoDate(value), {
       message: 'A data precisa estar no padrão ISO 8601 válido.',
     }),
+
+  scope: z
+    .enum(['pessoal', 'profissional'], {
+      message: 'O escopo deve ser pessoal ou profissional.',
+    })
+    .optional(),
+
+  theme: z
+    .enum(['amor', 'trabalho', 'crescimento_pessoal', 'religiao'], {
+      message: 'A categoria deve ser amor, trabalho, crescimento_pessoal ou religiao.',
+    })
+    .optional(),
+
+  recipientEmail: z
+    .string()
+    .trim()
+    .email('Informe um endereço de e-mail válido.')
+    .nullable()
+    .optional(),
+
+  mood: z.string().trim().max(50).optional(),
+
+  priority: z.enum(['Alta', 'Média', 'Baixa']).optional(),
+
+  actionItems: z
+    .array(
+      z.object({
+        id: z.string().min(1).max(80),
+        text: z.string().trim().min(1, 'A meta não pode ser vazia.').max(250),
+        done: z.boolean().default(false),
+      }),
+    )
+    .max(50, 'A cápsula pode ter no máximo 50 metas.')
+    .optional(),
+
+  deliveryChannels: z
+    .array(z.enum(['email', 'whatsapp']))
+    .max(2)
+    .refine((channels) => new Set(channels).size === channels.length, {
+      message: 'Os canais de entrega não podem se repetir.',
+    })
+    .optional(),
 });
