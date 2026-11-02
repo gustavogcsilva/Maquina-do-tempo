@@ -120,3 +120,4 @@ export async function verifyPassword(password, storedHash) {
     return false;
   }
 }
+// Autenticação de usuário e gerenciamento de sessão são implementados neste módulo, incluindo criação e verificação de tokens de sessão, bem como hashing e verificação de senhas com segurança.
