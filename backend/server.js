@@ -48,9 +48,15 @@ const loginSchema = z.object({
 // Middleware de verificação de Origem permitida (Anti-CSRF)
 function requireAllowedOrigin(req, res, next) {
   const origin = req.get('origin');
+  const isProd = process.env.NODE_ENV === 'production';
 
-  // Permite requisições internas/mesma origem ou das origens autorizadas
-  if (!origin || allowedOrigins.includes(origin)) {
+  // Em produção exigimos cabeçalho Origin válido nas rotas mutáveis (proteção CSRF).
+  // Em desenvolvimento permitimos ausência de Origin (ex: testes via curl/Postman),
+  // mas sempre validamos se o cabeçalho Origin estiver presente.
+  if (origin && allowedOrigins.includes(origin)) {
+    return next();
+  }
+  if (!isProd && !origin) {
     return next();
   }
 
@@ -65,6 +71,14 @@ function authRateLimiter(req, res, next) {
   const now = Date.now();
   const windowMs = 15 * 60 * 1000; // Janela de 15 minutos
   const maxAttempts = 25;
+
+  if (authAttempts.size > 5000) {
+    for (const [key, val] of authAttempts.entries()) {
+      if (now - val.firstAttempt >= windowMs) {
+        authAttempts.delete(key);
+      }
+    }
+  }
 
   const record = authAttempts.get(ip);
   if (record) {
@@ -188,6 +202,7 @@ app.post('/api/auth/register', requireAllowedOrigin, authRateLimiter, async (req
       data: {
         name,
         email: normalizedEmail,
+        passwordHash,
       },
     });
 
@@ -243,7 +258,7 @@ app.post('/api/auth/login', requireAllowedOrigin, authRateLimiter, async (req, r
       return res.status(401).json({ message: 'E-mail ou senha incorretos.' });
     }
 
-    const storedHash = await getUserPasswordHash(user.id);
+    const storedHash = user.passwordHash || (await getUserPasswordHash(user.id));
 
     if (!storedHash) {
       return res.status(401).json({
@@ -444,7 +459,7 @@ app.use((err, req, res, next) => {
   return res.status(500).json({ message: 'Erro interno no processamento do servidor.' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor backend Máquina do Tempo rodando em http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Servidor backend Máquina do Tempo rodando em http://127.0.0.1:${PORT}`);
   console.log('CORS habilitado para:', allowedOrigins.join(', '));
 });

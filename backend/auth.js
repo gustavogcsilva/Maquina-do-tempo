@@ -105,12 +105,15 @@ export async function verifyPassword(password, storedHash) {
   }
 
   const [salt, keyHex] = storedHash.split(':');
-  if (!salt || !keyHex) {
+  if (!salt || !keyHex || keyHex.length !== 128 || !/^[0-9a-f]+$/i.test(keyHex)) {
     return false;
   }
 
   try {
     const keyBuffer = Buffer.from(keyHex, 'hex');
+    if (keyBuffer.length !== 64) {
+      return false;
+    }
     const derivedKey = await scryptAsync(password, salt, keyBuffer.length);
     if (derivedKey.length !== keyBuffer.length) {
       return false;

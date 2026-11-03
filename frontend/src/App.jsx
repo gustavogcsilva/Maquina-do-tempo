@@ -59,9 +59,15 @@ const DEMO_CONNECTED_USER = {
   whatsappConsentAt: '2026-01-01T00:00:00.000Z',
 };
 
+// Perfil de teste só existe em desenvolvimento (npm run dev) ou se VITE_DEMO_MODE=true.
+// Em produção o visitante entra como convidado (dados locais) e só vê dados reais após login no servidor.
+const DEMO_MODE = import.meta.env.DEV || import.meta.env.VITE_DEMO_MODE === 'true';
+
 function App() {
   const buttonRef = useRef(null);
-  const [user, setUser] = useState(DEMO_CONNECTED_USER); // Inicia como conectado para o teste do usuário!
+  const [user, setUser] = useState(DEMO_MODE ? DEMO_CONNECTED_USER : null);
+  // Sem sessão real (convidado ou perfil de teste): operações ficam só no navegador.
+  const isLocalMode = !user || user.id === DEMO_CONNECTED_USER.id;
   const [currentView, setCurrentView] = useState('app');
   const [loadingAuth, setLoadingAuth] = useState(false);
   const [submittingAuth, setSubmittingAuth] = useState(false);
@@ -112,6 +118,13 @@ function App() {
   }, []);
 
   useEffect(() => {
+    // Convidado / perfil de teste: dados apenas locais, nunca mistura com o servidor.
+    if (isLocalMode) {
+      setCapsules(loadStoredCapsules());
+      setLoadingCapsules(false);
+      return undefined;
+    }
+
     let active = true;
     let refreshing = false;
 
@@ -121,14 +134,16 @@ function App() {
 
       try {
         const response = await api.get('/capsules');
-        if (active && Array.isArray(response.data?.capsules) && response.data.capsules.length > 0) {
+        if (active && Array.isArray(response.data?.capsules)) {
+          // Usuário real: lista do servidor, mesmo que vazia (sem misturar dados de demonstração).
           setCapsules(response.data.capsules);
           setCapsuleError('');
         }
-      } catch {
-        // Se a rota falhar ou estiver offline, usa os dados locais de demonstração sem travar
+      } catch (requestError) {
         if (active) {
-          setCapsules((prev) => (prev && prev.length > 0 ? prev : loadStoredCapsules()));
+          setCapsuleError(
+            requestError.response?.data?.message || 'Não foi possível carregar suas cápsulas.',
+          );
         }
       } finally {
         refreshing = false;
@@ -147,7 +162,7 @@ function App() {
 
   // Renderiza botão Google quando o modal de autenticação estiver aberto
   useEffect(() => {
-    if (!showAuthModal || !clientId || user || loadingAuth) return undefined;
+    if (!showAuthModal || !clientId || !isLocalMode || loadingAuth) return undefined;
 
     let active = true;
     const buttonElement = buttonRef.current;
@@ -192,7 +207,7 @@ function App() {
       active = false;
       if (buttonElement) buttonElement.replaceChildren();
     };
-  }, [clientId, loadingAuth, showAuthModal, user]);
+  }, [clientId, loadingAuth, showAuthModal, isLocalMode]);
 
   async function handleLogout() {
     setSubmittingAuth(true);
@@ -223,13 +238,10 @@ function App() {
         setCurrentView('app');
       }
     } catch (err) {
-      if (err.response?.status === 404 || !err.response) {
-        // Fallback elegante para visualização fluida se a rota local ainda não estiver no backend
-        setUser({
-          id: 'user-preview-1',
-          name: authPayload.name || authPayload.email.split('@')[0],
-          email: authPayload.email,
-        });
+      // Apenas em desenvolvimento: se a API estiver desligada, entra no perfil de teste local.
+      // Em produção NUNCA simulamos login — o erro é exibido ao usuário.
+      if (DEMO_MODE && !err.response) {
+        setUser(DEMO_CONNECTED_USER);
         setCurrentView('app');
         return;
       }
@@ -306,7 +318,7 @@ function App() {
   }
 
   async function handleCreateCapsule(newCapsule) {
-    if (!user) {
+    if (isLocalMode) {
       setCapsules((prev) => {
         const next = [newCapsule, ...prev];
         try {
@@ -346,7 +358,7 @@ function App() {
       item.id === actionId ? { ...item, done: !item.done } : item,
     );
 
-    if (!user) {
+    if (isLocalMode) {
       setCapsules((prev) => {
         const next = prev.map((item) => (item.id === capsuleId ? { ...item, actionItems } : item));
         try {
@@ -373,7 +385,7 @@ function App() {
   }
 
   async function handleDeleteCapsule(capsuleId) {
-    if (!user) {
+    if (isLocalMode) {
       setCapsules((prev) => {
         const next = prev.filter((cap) => cap.id !== capsuleId);
         try {
@@ -398,6 +410,16 @@ function App() {
   }
 
   async function handleSaveWhatsappProfile(profile) {
+    if (isLocalMode) {
+      setUser((prev) => ({
+        ...(prev || DEMO_CONNECTED_USER),
+        phoneNumber: profile.phoneNumber,
+        whatsappConsentAt: profile.whatsappConsent ? new Date().toISOString() : null,
+      }));
+      setShowWhatsappProfile(false);
+      return;
+    }
+
     const response = await api.patch('/profile/whatsapp', profile);
     setUser(response.data.user);
     setShowWhatsappProfile(false);
@@ -631,13 +653,15 @@ function App() {
                 <small>Explore livremente ou reconecte seu perfil</small>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px', width: '100%' }}>
-                <button
-                  type="button"
-                  className="bi-btn-primary bi-btn-full"
-                  onClick={() => setUser(DEMO_CONNECTED_USER)}
-                >
-                  ⚡ Reconectar como Gustavo (Teste)
-                </button>
+                {DEMO_MODE && (
+                  <button
+                    type="button"
+                    className="bi-btn-primary bi-btn-full"
+                    onClick={() => setUser(DEMO_CONNECTED_USER)}
+                  >
+                    ⚡ Reconectar como Gustavo (Teste)
+                  </button>
+                )}
                 <button
                   type="button"
                   className="bi-btn-secondary bi-btn-full"
@@ -1253,7 +1277,7 @@ function App() {
           capsule={selectedCapsule}
           onClose={() => setSelectedCapsuleId(null)}
           onToggleActionItem={handleToggleActionItem}
-          onForceOpen={handleForceOpen}
+          onForceOpen={isLocalMode ? handleForceOpen : undefined}
           onDelete={handleDeleteCapsule}
         />
       )}

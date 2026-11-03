@@ -7,6 +7,15 @@
  * 3. Modo Sandbox Portfólio (Fallback sem chaves: simula o envio com log e não quebra a aplicação)
  */
 
+function escapeHtml(unsafe = '') {
+  return String(unsafe)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export async function sendEmail({ to, subject, html, text }) {
   const resendApiKey = process.env.RESEND_API_KEY;
   const smtpHost = process.env.SMTP_HOST;
@@ -26,7 +35,7 @@ export async function sendEmail({ to, subject, html, text }) {
           from: process.env.EMAIL_FROM || 'Máquina do Tempo <onboarding@resend.dev>',
           to: [to],
           subject,
-          html: html || `<p>${text}</p>`,
+          html: html || `<p>${escapeHtml(text)}</p>`,
           text,
         }),
       });
