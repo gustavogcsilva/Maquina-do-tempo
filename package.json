@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",
+<<<<<<< HEAD
     "@prisma/client": "^7.10.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -25,5 +26,18 @@
   },
   "devDependencies": {
     "prisma": "^7.10.1"
+=======
+    "@prisma/client": "^6.19.3",
+    "express-rate-limit": "^8.7.1",
+    "helmet": "^8.3.0",
+    "pg": "^8.23.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "prisma": "^6.19.3"
+  },
+  "scripts": {
+    "db:push": "prisma db push"
+>>>>>>> f747bdd5f2be2f7d8d6e96622d95ab43e5645978
   }
 }
